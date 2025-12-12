@@ -4,11 +4,11 @@
     "description": "Extension name"
   },
   "appDesc": {
-    "message": "户部尚赢智能视频下载 - 支持多清晰度、断点续传、多线程加速",
+    "message": "HBSY智能视频下载 - 支持多清晰度、断点续传、多线程加速",
     "description": "Extension description"
   },
   "appTitle": {
-    "message": "户部尚赢智能视频下载",
+    "message": "HBSY智能视频下载",
     "description": "App title in header"
   },
   "tabVideos": {
@@ -74,7 +74,7 @@
     "description": "Download status: error"
   },
   "footerText": {
-    "message": "户部尚赢智能视频下载 v$VERSION$ • 检测到 $COUNT$ 个视频",
+    "message": "HBSY智能视频下载 v$VERSION$ • 检测到 $COUNT$ 个视频",
     "description": "Footer text",
     "placeholders": {
       "version": {

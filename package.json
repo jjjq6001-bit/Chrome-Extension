@@ -1,7 +1,7 @@
 {
   "name": "hbsy-videograbber-pro",
   "version": "1.0.0",
-  "description": "户部尚赢智能视频下载 - 支持多清晰度、断点续传、多线程加速",
+  "description": "HBSY智能视频下载 - 支持多清晰度、断点续传、多线程加速",
   "type": "module",
   "scripts": {
     "dev": "vite",

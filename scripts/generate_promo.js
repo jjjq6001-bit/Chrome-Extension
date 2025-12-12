@@ -29,7 +29,7 @@ const outputDir = join(projectDir, 'promo');
 
 const CONFIG = {
   productName: 'HBSY VideoGrabber Pro',
-  productNameCN: '户部尚赢智能视频下载',
+  productNameCN: 'HBSY智能视频下载',
   features: [
     '智能视频检测',
     '多清晰度选择 (360p-4K)',
@@ -229,7 +229,7 @@ ${CONFIG.supportedSites.map(s => `✅ ${s}`).join('\n')}
 ---
 
 **最后更新：** ${new Date().toLocaleDateString('zh-CN')}
-**作者：** 户部尚赢
+**作者：** HBSY
 
 > 如果觉得好用，欢迎分享给更多人！
 `;

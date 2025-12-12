@@ -1,7 +1,7 @@
-# HBSY VideoGrabber Pro - 户部尚赢智能视频下载
+# HBSY VideoGrabber Pro - HBSY智能视频下载
 
 > 英文名称：HBSY VideoGrabber Pro  
-> 中文名称：户部尚赢智能视频下载
+> 中文名称：HBSY智能视频下载
 
 一款解决现有视频下载扩展痛点的 Chrome 扩展，提供美观界面、多格式支持、断点续传等专业功能。
 

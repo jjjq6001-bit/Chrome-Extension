@@ -183,7 +183,7 @@ def create_release_notes(release_dir: Path, version: str) -> tuple:
 - Windows 7+ / macOS 10.12+ / Linux
 
 ---
-户部尚赢智能视频下载 - 专业的视频下载扩展
+HBSY智能视频下载 - 专业的视频下载扩展
 """
     
     # 英文更新日志
