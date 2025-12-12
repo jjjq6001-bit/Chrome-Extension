@@ -1,0 +1,90 @@
+{
+  "appName": {
+    "message": "HBSY VideoGrabber Pro",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "户部尚赢智能视频下载 - 支持多清晰度、断点续传、多线程加速",
+    "description": "Extension description"
+  },
+  "appTitle": {
+    "message": "户部尚赢智能视频下载",
+    "description": "App title in header"
+  },
+  "tabVideos": {
+    "message": "视频",
+    "description": "Videos tab"
+  },
+  "tabDownloads": {
+    "message": "下载",
+    "description": "Downloads tab"
+  },
+  "refresh": {
+    "message": "刷新",
+    "description": "Refresh button tooltip"
+  },
+  "settings": {
+    "message": "设置",
+    "description": "Settings button tooltip"
+  },
+  "detecting": {
+    "message": "检测视频中...",
+    "description": "Loading state text"
+  },
+  "noVideos": {
+    "message": "未检测到视频",
+    "description": "Empty state title"
+  },
+  "noVideosHint": {
+    "message": "请在包含视频的页面使用",
+    "description": "Empty state hint"
+  },
+  "videosFound": {
+    "message": "检测到 $COUNT$ 个视频",
+    "description": "Videos found count",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "noDownloads": {
+    "message": "暂无下载任务",
+    "description": "No downloads text"
+  },
+  "statusPending": {
+    "message": "等待中",
+    "description": "Download status: pending"
+  },
+  "statusDownloading": {
+    "message": "下载中",
+    "description": "Download status: downloading"
+  },
+  "statusPaused": {
+    "message": "已暂停",
+    "description": "Download status: paused"
+  },
+  "statusCompleted": {
+    "message": "已完成",
+    "description": "Download status: completed"
+  },
+  "statusError": {
+    "message": "下载失败",
+    "description": "Download status: error"
+  },
+  "footerText": {
+    "message": "户部尚赢智能视频下载 v$VERSION$ • 检测到 $COUNT$ 个视频",
+    "description": "Footer text",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "1.0.0"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
+  }
+}

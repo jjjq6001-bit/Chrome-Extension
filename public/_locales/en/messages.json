@@ -1,0 +1,90 @@
+{
+  "appName": {
+    "message": "HBSY VideoGrabber Pro",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "Smart Video Downloader - Multi-quality selection, resume downloads, multi-threaded acceleration",
+    "description": "Extension description"
+  },
+  "appTitle": {
+    "message": "HBSY VideoGrabber Pro",
+    "description": "App title in header"
+  },
+  "tabVideos": {
+    "message": "Videos",
+    "description": "Videos tab"
+  },
+  "tabDownloads": {
+    "message": "Downloads",
+    "description": "Downloads tab"
+  },
+  "refresh": {
+    "message": "Refresh",
+    "description": "Refresh button tooltip"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Settings button tooltip"
+  },
+  "detecting": {
+    "message": "Detecting videos...",
+    "description": "Loading state text"
+  },
+  "noVideos": {
+    "message": "No videos detected",
+    "description": "Empty state title"
+  },
+  "noVideosHint": {
+    "message": "Please visit a page with videos",
+    "description": "Empty state hint"
+  },
+  "videosFound": {
+    "message": "Found $COUNT$ video(s)",
+    "description": "Videos found count",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "noDownloads": {
+    "message": "No downloads yet",
+    "description": "No downloads text"
+  },
+  "statusPending": {
+    "message": "Pending",
+    "description": "Download status: pending"
+  },
+  "statusDownloading": {
+    "message": "Downloading",
+    "description": "Download status: downloading"
+  },
+  "statusPaused": {
+    "message": "Paused",
+    "description": "Download status: paused"
+  },
+  "statusCompleted": {
+    "message": "Completed",
+    "description": "Download status: completed"
+  },
+  "statusError": {
+    "message": "Failed",
+    "description": "Download status: error"
+  },
+  "footerText": {
+    "message": "HBSY VideoGrabber Pro v$VERSION$ • $COUNT$ video(s) found",
+    "description": "Footer text",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "1.0.0"
+      },
+      "count": {
+        "content": "$2",
+        "example": "3"
+      }
+    }
+  }
+}

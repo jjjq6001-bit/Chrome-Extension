@@ -1,0 +1,142 @@
+# HBSY VideoGrabber Pro - 自动发布工作流
+# 
+# 触发条件: 推送以 'v' 开头的标签 (如 v1.0.0)
+# 
+# 使用方法:
+#   git tag v1.0.0
+#   git push --tags
+#
+# 工作流程:
+#   1. 检出代码
+#   2. 设置 Node.js 和 Python 环境
+#   3. 构建扩展 (npm run build)
+#   4. 运行打包脚本 (build_release.py)
+#   5. 生成 Release Notes (基于 commit log)
+#   6. 创建 GitHub Release 并上传文件
+
+name: 🚀 Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # 匹配 v1.0.0, v2.1.3 等
+
+# 设置权限
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 📦 Build and Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. 检出代码
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史，用于生成 changelog
+
+      # 2. 设置 Node.js 环境
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. 设置 Python 环境
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 4. 安装依赖
+      - name: 📚 Install dependencies
+        run: npm ci
+
+      # 5. 构建扩展
+      - name: 🔨 Build extension
+        run: npm run build
+
+      # 6. 运行打包脚本
+      - name: 📦 Run release script
+        run: python build_release.py
+
+      # 7. 获取版本号
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      # 8. 生成 Release Notes (基于 commit log)
+      - name: 📝 Generate Release Notes
+        id: changelog
+        run: |
+          # 获取上一个标签
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            # 如果没有上一个标签，获取所有提交
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          else
+            # 获取两个标签之间的提交
+            COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # 生成 Release Notes
+          cat << EOF > release_notes.md
+          ## 🎉 HBSY VideoGrabber Pro v${{ steps.version.outputs.version }}
+          
+          ### 📥 下载 / Download
+          
+          | 文件 | 说明 |
+          |------|------|
+          | \`HBSY_VideoGrabber_Pro_v${{ steps.version.outputs.version }}_Install.zip\` | 安装包 (Install Package) |
+          | \`HBSY_VideoGrabber_Pro_v${{ steps.version.outputs.version }}_Source.zip\` | 源码包 (Source Code) |
+          
+          ### 📦 安装说明 / Installation
+          
+          1. 下载 \`Install.zip\` 并解压
+          2. 打开 Chrome，访问 \`chrome://extensions/\`
+          3. 开启「开发者模式」
+          4. 点击「加载已解压的扩展程序」
+          5. 选择解压后的文件夹
+          
+          ### 📋 更新内容 / Changelog
+          
+          ${COMMITS}
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${{ steps.version.outputs.tag }}
+          EOF
+          
+          echo "Generated release notes"
+
+      # 9. 创建 GitHub Release
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "🎉 HBSY VideoGrabber Pro v${{ steps.version.outputs.version }}"
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          files: |
+            release/HBSY_VideoGrabber_Pro_v${{ steps.version.outputs.version }}_Install.zip
+            release/HBSY_VideoGrabber_Pro_v${{ steps.version.outputs.version }}_Source.zip
+            release/release_note_zh.txt
+            release/release_note_en.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 10. 输出结果
+      - name: ✅ Release Summary
+        run: |
+          echo "🎉 Release v${{ steps.version.outputs.version }} created successfully!"
+          echo ""
+          echo "📦 Uploaded files:"
+          ls -la release/
+          echo ""
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
