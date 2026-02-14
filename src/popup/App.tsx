@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import type { VideoInfo, Quality, DownloadTask } from '../types';
-import { useVideoStore } from '../store';
+import { useSettingsStore, useVideoStore } from '../store';
 import { formatFileSize, formatSpeed } from '../utils/parser';
 import { i18n } from '../utils/i18n';
 import { Download, Play, Pause, Check, AlertCircle, Video, Settings, RefreshCw } from 'lucide-react';
 
 const App: FC = () => {
   const { videos, tasks, loading, setVideos, setTasks, updateTask, setLoading } = useVideoStore();
+  const { maxConcurrent, chunkSize, setMaxConcurrent, setChunkSize } = useSettingsStore();
   const [activeTab, setActiveTab] = useState<'videos' | 'downloads'>('videos');
+  const [showSettings, setShowSettings] = useState(false);
+  const [version, setVersion] = useState('1.0.0');
 
   useEffect(() => {
+    setVersion(chrome.runtime.getManifest().version);
     loadVideos();
     loadTasks();
+    loadSettings();
     
     const handleMessage = (message: any) => {
       if (message.type === 'PROGRESS_UPDATE') {
@@ -47,9 +52,30 @@ const App: FC = () => {
     loadVideos();
   };
 
+  const loadSettings = async () => {
+    const response = await chrome.runtime.sendMessage({ type: 'GET_SETTINGS' });
+    if (typeof response?.maxConcurrent === 'number') {
+      setMaxConcurrent(response.maxConcurrent);
+    }
+    if (typeof response?.chunkSize === 'number') {
+      setChunkSize(response.chunkSize);
+    }
+  };
+
+  const saveSettings = async (nextMaxConcurrent: number, nextChunkSize: number) => {
+    const response = await chrome.runtime.sendMessage({
+      type: 'UPDATE_SETTINGS',
+      maxConcurrent: nextMaxConcurrent,
+      chunkSize: nextChunkSize,
+    });
+    setMaxConcurrent(response.maxConcurrent);
+    setChunkSize(response.chunkSize);
+    setShowSettings(false);
+  };
+
   return (
     <div className="bg-gray-900 text-white min-h-[400px] max-h-[600px] overflow-hidden flex flex-col">
-      <Header onRefresh={handleRefresh} />
+      <Header onRefresh={handleRefresh} onOpenSettings={() => setShowSettings(true)} />
       <TabBar 
         activeTab={activeTab} 
         onTabChange={setActiveTab} 
@@ -65,16 +91,25 @@ const App: FC = () => {
           <DownloadList tasks={tasks} />
         )}
       </main>
-      <Footer videoCount={videos.length} />
+      <Footer version={version} videoCount={videos.length} />
+      {showSettings && (
+        <SettingsModal
+          maxConcurrent={maxConcurrent}
+          chunkSize={chunkSize}
+          onClose={() => setShowSettings(false)}
+          onSave={saveSettings}
+        />
+      )}
     </div>
   );
 };
 
 interface HeaderProps {
   onRefresh: () => void;
+  onOpenSettings: () => void;
 }
 
-const Header: FC<HeaderProps> = ({ onRefresh }) => (
+const Header: FC<HeaderProps> = ({ onRefresh, onOpenSettings }) => (
   <header className="bg-gray-800 px-4 py-3 flex items-center justify-between border-b border-gray-700">
     <div className="flex items-center gap-2">
       <Video className="w-5 h-5 text-indigo-400" />
@@ -84,7 +119,7 @@ const Header: FC<HeaderProps> = ({ onRefresh }) => (
       <button onClick={onRefresh} className="p-1.5 hover:bg-gray-700 rounded-lg transition" title={i18n.refresh()}>
         <RefreshCw className="w-4 h-4 text-gray-400" />
       </button>
-      <button className="p-1.5 hover:bg-gray-700 rounded-lg transition" title={i18n.settings()}>
+      <button onClick={onOpenSettings} className="p-1.5 hover:bg-gray-700 rounded-lg transition" title={i18n.settings()}>
         <Settings className="w-4 h-4 text-gray-400" />
       </button>
     </div>
@@ -356,14 +391,63 @@ const DownloadTaskCard: FC<DownloadTaskCardProps> = ({ task }) => {
 };
 
 interface FooterProps {
+  version: string;
   videoCount: number;
 }
 
-const Footer: FC<FooterProps> = ({ videoCount }) => (
+const Footer: FC<FooterProps> = ({ version, videoCount }) => (
   <footer className="px-4 py-2 border-t border-gray-700 text-xs text-gray-500 text-center">
-    {i18n.footerText('1.0.0', videoCount)}
+    {i18n.footerText(version, videoCount)}
   </footer>
 );
+
+interface SettingsModalProps {
+  maxConcurrent: number;
+  chunkSize: number;
+  onClose: () => void;
+  onSave: (maxConcurrent: number, chunkSize: number) => void;
+}
+
+const SettingsModal: FC<SettingsModalProps> = ({ maxConcurrent, chunkSize, onClose, onSave }) => {
+  const [nextConcurrent, setNextConcurrent] = useState(maxConcurrent);
+  const [nextChunkSize, setNextChunkSize] = useState(chunkSize);
+
+  return (
+    <div className="absolute inset-0 bg-black/60 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-gray-800 rounded-xl p-4 border border-gray-700 space-y-4">
+        <h2 className="text-sm font-semibold">{i18n.settings()}</h2>
+        <label className="block text-xs text-gray-300">
+          {i18n.maxConcurrent()}
+          <select
+            className="mt-1 w-full bg-gray-700 rounded-lg px-2 py-1"
+            value={nextConcurrent}
+            onChange={(e) => setNextConcurrent(Number(e.target.value))}
+          >
+            {[1, 2, 3, 4, 5].map((value) => (
+              <option key={value} value={value}>{value}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-xs text-gray-300">
+          {i18n.chunkSize()}
+          <select
+            className="mt-1 w-full bg-gray-700 rounded-lg px-2 py-1"
+            value={nextChunkSize}
+            onChange={(e) => setNextChunkSize(Number(e.target.value))}
+          >
+            {[1, 2, 4, 8].map((mb) => (
+              <option key={mb} value={mb * 1024 * 1024}>{mb} MB</option>
+            ))}
+          </select>
+        </label>
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} className="px-3 py-1.5 rounded-lg bg-gray-700 text-xs">{i18n.cancel()}</button>
+          <button onClick={() => onSave(nextConcurrent, nextChunkSize)} className="px-3 py-1.5 rounded-lg bg-indigo-500 text-xs">{i18n.save()}</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function formatDuration(seconds: number): string {
   if (!seconds || isNaN(seconds)) return '00:00';

@@ -27,6 +27,22 @@
     "message": "Settings",
     "description": "Settings button tooltip"
   },
+  "maxConcurrent": {
+    "message": "Max concurrent downloads",
+    "description": "Max concurrent downloads"
+  },
+  "chunkSize": {
+    "message": "Chunk size",
+    "description": "Chunk size"
+  },
+  "cancel": {
+    "message": "Cancel",
+    "description": "Cancel button"
+  },
+  "save": {
+    "message": "Save",
+    "description": "Save button"
+  },
   "detecting": {
     "message": "Detecting videos...",
     "description": "Loading state text"
