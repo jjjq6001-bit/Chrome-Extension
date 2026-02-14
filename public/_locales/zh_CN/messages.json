@@ -27,6 +27,22 @@
     "message": "设置",
     "description": "Settings button tooltip"
   },
+  "maxConcurrent": {
+    "message": "最大并发下载数",
+    "description": "Max concurrent downloads"
+  },
+  "chunkSize": {
+    "message": "分片大小",
+    "description": "Chunk size"
+  },
+  "cancel": {
+    "message": "取消",
+    "description": "Cancel button"
+  },
+  "save": {
+    "message": "保存",
+    "description": "Save button"
+  },
   "detecting": {
     "message": "检测视频中...",
     "description": "Loading state text"

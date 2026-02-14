@@ -6,10 +6,13 @@ class DownloadManager {
   private maxConcurrent = 3;
 
   constructor() {
-    this.init();
+    this.init().catch(console.error);
   }
 
-  private init(): void {
+  private async init(): Promise<void> {
+    await this.loadSettings();
+    await this.loadPersistedTasks();
+
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       this.handleMessage(message, sendResponse);
       return true;
@@ -34,7 +37,47 @@ class DownloadManager {
       case 'GET_TASKS':
         sendResponse({ tasks: Array.from(this.tasks.values()) });
         break;
+      case 'GET_SETTINGS':
+        sendResponse({ maxConcurrent: this.maxConcurrent, chunkSize: this.chunkSize });
+        break;
+      case 'UPDATE_SETTINGS':
+        await this.updateSettings(message.maxConcurrent, message.chunkSize);
+        sendResponse({ success: true, maxConcurrent: this.maxConcurrent, chunkSize: this.chunkSize });
+        break;
     }
+  }
+
+  private async loadPersistedTasks(): Promise<void> {
+    const result = await chrome.storage.local.get(null);
+    Object.entries(result).forEach(([key, value]) => {
+      if (key.startsWith('task_') && value) {
+        this.tasks.set((value as DownloadTask).id, value as DownloadTask);
+      }
+    });
+  }
+
+  private async loadSettings(): Promise<void> {
+    const { maxConcurrent, chunkSize } = await chrome.storage.local.get(['maxConcurrent', 'chunkSize']);
+    if (typeof maxConcurrent === 'number' && maxConcurrent > 0) {
+      this.maxConcurrent = maxConcurrent;
+    }
+    if (typeof chunkSize === 'number' && chunkSize > 0) {
+      this.chunkSize = chunkSize;
+    }
+  }
+
+  private async updateSettings(maxConcurrent?: number, chunkSize?: number): Promise<void> {
+    if (typeof maxConcurrent === 'number' && maxConcurrent > 0) {
+      this.maxConcurrent = maxConcurrent;
+    }
+    if (typeof chunkSize === 'number' && chunkSize > 0) {
+      this.chunkSize = chunkSize;
+    }
+
+    await chrome.storage.local.set({
+      maxConcurrent: this.maxConcurrent,
+      chunkSize: this.chunkSize,
+    });
   }
 
   private async createTask(video: VideoInfo, quality: Quality): Promise<string> {
@@ -208,6 +251,7 @@ class DownloadManager {
       }
 
       chunk.status = 'completed';
+      await this.saveTask(task);
     } catch (error) {
       console.error('Chunk download failed:', error);
     }
@@ -238,6 +282,7 @@ class DownloadManager {
   }
 
   private notifyProgress(task: DownloadTask): void {
+    this.saveTask(task).catch(() => {});
     chrome.runtime.sendMessage({
       type: 'PROGRESS_UPDATE',
       task,

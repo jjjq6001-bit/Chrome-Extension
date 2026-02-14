@@ -19,7 +19,7 @@
 
 ### 开发模式
 ```bash
-cd VideoGrabber
+cd Chrome-Extension
 npm install
 npm run build
 ```
@@ -28,7 +28,7 @@ npm run build
 1. 在 Chrome 中打开 `chrome://extensions/`
 2. 开启"开发者模式"
 3. 点击"加载已解压的扩展程序"
-4. 选择 `VideoGrabber/dist` 文件夹
+4. 选择 `Chrome-Extension/dist` 文件夹
 
 ## 技术栈
 
@@ -48,7 +48,7 @@ npm run build
 ## 项目结构
 
 ```
-VideoGrabber/
+Chrome-Extension/
 ├── dist/                 # 构建输出（加载此目录到 Chrome）
 ├── docs/                 # 项目文档
 ├── public/icons/         # 扩展图标
